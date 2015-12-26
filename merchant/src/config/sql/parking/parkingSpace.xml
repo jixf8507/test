@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 车辆查询SQL -->
+	<bean id="parking_space_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.siteName,ps.*,d.deviceNo,d.nameplate 
+      		from parking_space ps inner join site s on s.id = ps.parkingId 
+      		left join stake_devicename d on d.factoryNo=ps.factoryNo
+      		where 1=1			
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and ps.status=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and ps.parkingId = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="spaceNO" />
+					<property name="value" value="and ps.spaceNO like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="factoryNo" />
+					<property name="value" value="and ps.factoryNo = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="factoryNoLike" />
+					<property name="value" value="and ps.factoryNo like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="grooveNo" />
+					<property name="value" value="and ps.grooveNo = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="position" />
+					<property name="value" value="and ps.position = ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by ps.id desc " />
+	</bean>
+
+</beans>

@@ -1,0 +1,8 @@
+/applicationContext.xml
+/com
+/ehcache.xml
+/ehcache.xsd
+/log4j.properties
+/memcache.properties
+/spring-memcache.xml
+/sql

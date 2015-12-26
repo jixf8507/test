@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 商家用户帐号交易明细查询SQL -->
+	<!-- select ar.addBalance,ar.newBalance,ar.createdTime,ar.type,vs.name,vs.phone,ar.transactUser,ar.describe 
+      		from account_record ar,vs_customer vs
+			where ar.customerId=vs.id -->
+	<bean id="customer_accountRecord_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[ 
+      		select ar.addBalance,ar.newBalance,ar.createdTime,ar.type,a.cardNO,c.name,c.idCard ,c.phone,ar.transactUser,ar.describe,ar.ticket 
+      		from account_record ar , account a,customer c 
+			where ar.accountId=a.id and a.customerId = c.id and ar.customerTable='customer'
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="customerId" />
+					<property name="value" value="and a.customerId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="accountId" />
+					<property name="value" value="and ar.accountId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value" value="and ar.type=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ar.createdTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ar.createdTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY ar.id desc   " />
+	</bean>
+
+	<!-- 用户账户退款记录 -->
+	<bean id="customer_refundrecord_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select ar.addBalance,ar.newBalance,ar.createdTime,ar.type,a.cardNO,c.name,c.idCard,c.phone,ar.transactUser,s.siteName,ar.describe 
+      		from account_record ar , vs_account a,customer c ,site s
+			where ar.accountId=a.id and a.customerId = c.id and ar.siteId=s.id
+			 and ar.type in ('余额退款','保证金退款')
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value" value="and ar.type=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and ar.siteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ar.createdTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ar.createdTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY ar.id desc   " />
+	</bean>
+	
+	<!-- 注销易用户的日统计 -->
+	<bean id="customer_accountCancel_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[ 
+						SELECT
+							DATE_FORMAT(a.deletedTime,'%Y-%m-%d') day,
+							COUNT(*) cs
+						FROM
+							account a
+						WHERE
+							1 = 1
+						
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="customerId" />
+					<property name="value" value="and a.customerId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="accountId" />
+					<property name="value" value="and ar.accountId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value" value="and ar.type=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.deletedTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.deletedTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.`status` = ? ]]>
+						</value>
+					</property>
+				</bean>
+				
+				
+			</list>
+		</property>
+		<property name="order" value=" GROUP BY DATE_FORMAT(a.deletedTime,'%Y-%m-%d') ORDER BY day;" />
+	</bean>
+	
+	
+	
+	<!-- 开户用户的日统计 -->
+	<bean id="customer_accountRegiste_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[ 
+						SELECT
+							DATE_FORMAT(a.createdTime,'%Y-%m-%d') day,
+							COUNT(*) cs
+						FROM
+							account a
+						WHERE
+							1 = 1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="customerId" />
+					<property name="value" value="and a.customerId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="accountId" />
+					<property name="value" value="and ar.accountId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value" value="and ar.type=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" GROUP BY DATE_FORMAT(a.createdTime,'%Y-%m-%d') ORDER BY day;" />
+	</bean>
+	
+	
+	
+	
+	
+
+</beans>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 充电卡查询SQL -->
+	<bean id="stake_card_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			select sc.id,sc.cardID,sc.cardNumber,c.`name`,c.phone,sc.carId,
+			sc.cardType,sc.openAccountTime,sc.isAnnul,a.balance 
+      		from stake_cardinfo sc LEFT JOIN customer c on c.id = sc.customerId
+      		LEFT JOIN account a on c.id = a.customerId and sc.merchantId=a.merchantId where 1=1  			 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="cardID" />
+					<property name="value" value="and sc.cardID like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="cardNumber" />
+					<property name="value" value="and sc.cardNumber like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and sc.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and sc.carId like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="isAnnul" />
+					<property name="value" value="and sc.isAnnul = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and sc.openAccountTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and sc.openAccountTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by sc.id desc " />
+	</bean>
+</beans>

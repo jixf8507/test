@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 订单查询SQL -->
+	<bean id="order_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.id,o.schemingGetTime,o.schemingReturnTime,o.realityGetTime,o.realityReturnTime,c.carNumber,c.littleIcon,c.vin,c.soc,o.surplusKmsForGet,o.surplusKmsForReturn,
+      		ci.name,ci.phone,gs.siteName as gsiteName,rs.siteName as rsiteName,a.cardNO,a.balance,o.priceTypeTableName,o.returnCarConfirm,o.socForGet,o.socForReturn,o.checkUser,o.checkDescribe,
+      		o.orderStatus,o.subOrderStatus,h.typeName,h.type,o.totalCost,(o.kmsForReturn-o.kmsForGet) as kms,o.menForGet,o.menForReturn,o.menForCharge,o.carId,o.ticket,o.payment,o.maintenanceCost,
+      		o.kmsForReturn,o.kmsForGet,o.perKms,o.perKmsCost,o.useCost,o.otherCost,o.getCarStatus,o.returnCarStatus,d.deviceNO,d.`status` as deviceStatus,o.couponCost,
+      		d.currentCarStatus,d.surplusKms as dsurplusKms,d.curKms,c.surplusKms as csurplusKms,c.kms as ckms,o.couponId,co.balance as coBalance,co.couponName
+			from `order` o INNER JOIN car c on o.carId=c.id INNER JOIN customer ci on o.customerId=ci.id 
+			left JOIN site gs on o.relityGetSiteId =gs.id left JOIN site rs on o.relityReturnSiteId = rs.id 
+			inner JOIN vs_price_type h on (o.priceTypeId = h.id and o.priceTypeTableName = h.priceTypeTableName)
+			left JOIN account a on (a.customerId=ci.id and a.merchantId=o.merchantId and a.status!='注销')
+			left join car_device d on d.carId=c.id and d.carTableName='car'
+			left JOIN coupon co on o.couponId = co.id 
+			where  1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="payment" />
+					<property name="value" value="and o.payment=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderStatus" />
+					<property name="value" value="and o.orderStatus=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="relityGetSiteId" />
+					<property name="value" value="and o.relityGetSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="relityReturnSiteId" />
+					<property name="value" value="and o.relityReturnSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="priceTypeTableName" />
+					<property name="value" value="and o.priceTypeTableName=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderType" />
+					<property name="value" value="and o.orderType = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderId" />
+					<property name="value" value="and o.id = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and ci.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="menForCharge" />
+					<property name="value" value="and o.menForCharge like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="vin" />
+					<property name="value" value="and c.vin like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and ci.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="peccancyTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ? BETWEEN o.realityGetTime and o.realityReturnTime ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value"
+						value="and o.subOrderStatus = '已入账' and 'yes' = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status1" />
+					<property name="value"
+						value="and o.subOrderStatus != '已入账' and 'yes' = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="getApply" />
+					<property name="value"
+						value="and (o.fetchCarConfirm = ? or o.fetchCarConfirm = '未查看') " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="getConfirm" />
+					<property name="value"
+						value="and (o.fetchCarConfirm = ? or o.fetchCarConfirm = '已审查') " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnApply" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='客户拒绝') " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnConfirm" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='客户同意')" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnConfirm" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='客户同意')" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnCarConfirm" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='已审查')" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by o.id desc " />
+	</bean>
+
+	<!-- 订单查询SQL 表格显示内容 -->
+	<bean id="table_order_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.id,o.realityGetTime,o.realityReturnTime,o.maintenanceCost,o.menForCharge,o.payment,o.subOrderStatus,o.couponCost,
+      		ci.name,ci.phone,gs.siteName as gsiteName,rs.siteName as rsiteName,c.carNumber,
+      		o.totalCost,(o.kmsForReturn-o.kmsForGet) as kms,o.perKmsCost,o.useCost,o.otherCost
+			from `order` o INNER JOIN car c on o.carId=c.id INNER JOIN customer ci on o.customerId=ci.id 
+			left JOIN site gs on o.relityGetSiteId =gs.id left JOIN site rs on o.relityReturnSiteId = rs.id 
+			left JOIN account a on (a.customerId=ci.id and a.merchantId=o.merchantId and a.status!='注销')
+			where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="payment" />
+					<property name="value" value="and o.payment=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderStatus" />
+					<property name="value" value="and o.orderStatus=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="relityGetSiteId" />
+					<property name="value" value="and o.relityGetSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="relityReturnSiteId" />
+					<property name="value" value="and o.relityReturnSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="priceTypeTableName" />
+					<property name="value" value="and o.priceTypeTableName=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderType" />
+					<property name="value" value="and o.orderType = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderId" />
+					<property name="value" value="and o.id = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and ci.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="menForCharge" />
+					<property name="value" value="and o.menForCharge like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="vin" />
+					<property name="value" value="and c.vin like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and ci.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="peccancyTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ? BETWEEN o.realityGetTime and o.realityReturnTime ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value"
+						value="and o.subOrderStatus = '已入账' and 'yes' = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status1" />
+					<property name="value"
+						value="and o.subOrderStatus != '已入账' and 'yes' = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="getApply" />
+					<property name="value"
+						value="and (o.fetchCarConfirm = ? or o.fetchCarConfirm = '未查看') " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="getConfirm" />
+					<property name="value"
+						value="and (o.fetchCarConfirm = ? or o.fetchCarConfirm = '已审查') " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnApply" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='客户拒绝') " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnConfirm" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='客户同意')" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnConfirm" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='客户同意')" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="returnCarConfirm" />
+					<property name="value"
+						value="and (o.returnCarConfirm = ? or o.returnCarConfirm ='已审查')" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by o.id desc " />
+	</bean>
+
+	<bean id="order_chargeRecord_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select ar.id,ar.checkUser,ar.checkDescribe,ar.addBalance,ar.newBalance,ar.createdTime,ar.type,a.cardNO,
+      		c.name,c.idCard,c.phone,ar.transactUser,s.siteName,ar.ticket,ar.describe,ar.status 
+      		from account_record ar,vs_account a,customer c,site s
+			where ar.accountId=a.id and a.customerId = c.id and ar.siteId=s.id
+			and ar.type in ('余额充值','保证金充值','电子钱包充值')
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="transactUser" />
+					<property name="value" value="and ar.transactUser like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="checkUser" />
+					<property name="value" value="and ar.checkUser like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value" value="and ar.type=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and ar.siteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and ar.status=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ar.createdTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and ar.createdTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY ar.id desc   " />
+	</bean>
+	<!-- 租赁点租赁统计 -->
+	<bean id="order_statistics_site_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.siteName ,count(*) cs,sum(o.totalCost) cost
+			from site s,`order` o where s.id=o.relityGetSiteId and o.orderStatus='已付费'					
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="GROUP BY s.siteName" />
+	</bean>
+
+	<!-- 每月租赁统计 -->
+	<bean id="order_statistics_month_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select DATE_FORMAT(o.realityReturnTime,'%Y-%m') month,sum(o.totalCost) cost,count(*) cs  
+      		from `order` o where o.orderStatus='已付费'     		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value="GROUP BY DATE_FORMAT(o.realityReturnTime,'%Y-%m') ORDER BY month" />
+	</bean>
+
+	<!-- 每天租赁统计 -->
+	<bean id="order_statistics_day_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select DATE_FORMAT(o.realityReturnTime,'%Y-%m-%d') day,sum(o.totalCost) cost,count(*) cs  
+      		from `order` o where (o.orderStatus='已付费' or o.orderStatus='已还车') and o.orderType=1    		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value="GROUP BY DATE_FORMAT(o.realityReturnTime,'%Y-%m-%d') ORDER BY day" />
+	</bean>
+
+	<!-- 每天租赁取车统计 -->
+	<bean id="order_statistics_day_get_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select DATE_FORMAT(o.realityGetTime,'%Y-%m-%d') day,count(*) cs  
+      		from `order` o where o.orderStatus!='已取消' and o.orderStatus!='已预约'  and o.orderType=1   		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityGetTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityGetTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value="GROUP BY DATE_FORMAT(o.realityGetTime,'%Y-%m-%d') ORDER BY day" />
+	</bean>
+
+	<!-- 租赁点待审核订单查询 -->
+	<bean id="order_monitor_site_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			select * from (
+			select o.id,o.orderStatus,o.relityGetSiteId as siteId,o.fetchCarConfirm carConfirm,o.merchantId,o.orderType  from `order` o where o.orderStatus in ('已取车','已预约') 
+			union all 
+			select o.id,o.orderStatus,o.relityReturnSiteId,o.returnCarConfirm,o.merchantId,o.orderType from `order` o where o.orderStatus='已还车' 
+			) t where 1=1   		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and t.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and t.siteId=? " />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 租赁点待审核订单（公务用车,车辆调度）查询 -->
+	<bean id="other_order_monitor_site_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			select t.*,s.siteName,c.carNumber,ct.typeName,cm.manufacturerName,d.deviceNO,d.surplusKms as dsurplusKms,d.curKms,c.surplusKms as csurplusKms,c.kms,c.status  from (
+			select o.orderStatus,o.relityGetSiteId as siteId,o.fetchCarConfirm carConfirm,o.merchantId,o.orderType,o.carId from `order` o where o.orderStatus='已取车' 
+			union all 
+			select o.orderStatus,o.relityReturnSiteId as siteId,o.returnCarConfirm,o.merchantId,o.orderType,o.carId  from `order` o where o.orderStatus='已还车' 
+			) t inner join car c on (t.carId = c.id) inner join car_type ct on (c.carTypeId = ct.id )  inner join car_manufacturer cm on 
+      		(ct.carManufacturerId = cm.id)  left join car_device d on (d.carId=c.id and d.carTableName='car') inner join site s on (s.id = t.siteId ) where t.carConfirm !='已关门'  		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and t.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and t.siteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderType" />
+					<property name="value" value="and t.orderType=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 超时订单查询SQL -->
+	<bean id="order_outtime_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.id,o.carId,o.customerId,c.carNumber from `order` o INNER JOIN car c on o.carId=c.id 
+      		where  o.orderStatus='已预约' and  o.schemingGetTime < now() 
+		 ]]></value>
+		</property>
+		<property name="order" value="order by o.id desc " />
+	</bean>
+
+
+
+	<!-- 超时还车订单查询SQL -->
+	<bean id="order_outReturn_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.id,o.carId,o.customerId,c.carNumber from `order` o INNER JOIN car c on o.carId=c.id 
+      		where  o.orderStatus='已还车' and o.returnCarConfirm='已审查' and  date_add(o.checkReturnTime, INTERVAL 10 MINUTE) < now()
+		 ]]></value>
+		</property>
+		<property name="order" value="order by o.id desc " />
+	</bean>
+
+	<bean id="order_kms_statistics_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select sum(o.kmsForReturn-o.kmsForGet) kms from `order` o where o.orderStatus in ('已还车','已付费')
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="realityReturnTime" />
+					<property name="value">
+						<value><![CDATA[and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- and DATE_FORMAT(o.realityReturnTime,'%Y-%m-%d') >= date_sub(curdate(), 
+		INTERVAL 30 DAY) and o.realityReturnTime <= now() -->
+	<bean id="day_order_kms_statistics_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select sum(o.kmsForReturn-o.kmsForGet) kms,DATE_FORMAT(o.realityReturnTime,'%Y-%m-%d') day 
+      		from `order` o where o.orderStatus in ('已还车','已付费') 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value=" GROUP BY DATE_FORMAT(o.realityReturnTime,'%Y-%m-%d') ORDER BY day " />
+	</bean>
+
+</beans>

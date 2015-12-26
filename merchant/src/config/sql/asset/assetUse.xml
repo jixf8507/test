@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 固定资产领用信息查询SQL -->
+	<bean id="USE_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select u.*,s.siteName,mu.userName from merchant_assets_use u 
+      		left join site s on (u.siteId = s.id) 
+      	    left join merchant_user mu on (u.userId = mu.id) where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and u.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and u.siteId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and u.flag=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="userName" />
+					<property name="value" value="and mu.userName like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and u.useDate >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and u.useDate <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY u.id desc " />
+	</bean>
+	
+	<!-- 固定资产领用详细信息查询SQL -->
+	<bean id="USE_DETAIL_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select d.*,a.assetsName,a.model,a.unit,a.flag,c.name,s.siteName,mu.userName 
+      		from merchant_assets_use_detail d
+      		inner join merchant_assets_use u on (d.useId = u.id)
+      		left join merchant_assets a on (a.id = d.assetsId) 
+      		left join merchant_assets_category c on (a.categoryId = c.id) 
+      		left join site s on (u.siteId = s.id) 
+      	    left join merchant_user mu on (u.userId = mu.id) where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="useId" />
+					<property name="value" value="and d.useId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="categoryId" />
+					<property name="value" value="and a.categoryId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="assetsName" />
+					<property name="value" value="and a.assetsName like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY d.id desc " />
+	</bean>
+
+</beans>

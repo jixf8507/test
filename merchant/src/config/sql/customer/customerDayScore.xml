@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+       
+     <!-- 条件查询CustomerDayScore的sql-->
+	<bean id="customer_day_score_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+					SELECT
+						*
+					FROM
+						customer_day_score cds
+					WHERE
+						1 = 1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="id" />
+								<property name="value" value=" and cds.id = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="customerId" />
+								<property name="value" value=" and cds.customerId = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="day" />
+								<property name="value" value=" and cds.day = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="addScore" />
+								<property name="value" value=" and cds.addScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="reducedScore" />
+								<property name="value" value=" and cds.reducedScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="totleScore" />
+								<property name="value" value=" and cds.totleScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="registeredScore" />
+								<property name="value" value=" and cds.registeredScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="certifiedScore" />
+								<property name="value" value=" and cds.certifiedScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="assureScore" />
+								<property name="value" value=" and cds.assureScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="payScore" />
+								<property name="value" value=" and cds.payScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="carTimeScore" />
+								<property name="value" value=" and cds.carTimeScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="refereeScore" />
+								<property name="value" value=" and cds.refereeScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="beRefereeScore" />
+								<property name="value" value=" and cds.beRefereeScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="peccancyScore" />
+								<property name="value" value=" and cds.peccancyScore = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="damageScore" />
+								<property name="value" value=" and cds.damageScore = ? " />
+						</bean>
+							<bean class="com.qx.common.sql.Condition">
+									<property name="key" value="beginTime" />
+									<property name="value">
+											<value>
+											<![CDATA[ and cds.createdTime >= ? ]]>
+											</value>
+									</property>
+							</bean>
+							<bean class="com.qx.common.sql.Condition">
+									<property name="key" value="endTime" />
+									<property name="value">
+											<value>
+											<![CDATA[ and cds.createdTime <= ? ]]>
+											</value>
+									</property>
+							</bean>
+			</list>
+		</property>
+		<property name="order" value="order by id desc " />
+	</bean>
+	
+	<!-- 根据ID查找CustomerDayScore的sql -->
+	<bean id="customer_day_score_get_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+					SELECT
+							cds.id,
+							cds.customerId,
+							cds.day,
+							cds.addScore,
+							cds.reducedScore,
+							cds.totleScore,
+							cds.registeredScore,
+							cds.certifiedScore,
+							cds.assureScore,
+							cds.payScore,
+							cds.carTimeScore,
+							cds.refereeScore,
+							cds.beRefereeScore,
+							cds.peccancyScore,
+							cds.damageScore,
+							cds.createdTime
+					FROM
+						customer_day_score cds	
+					WHERE
+					 cds.id = ?
+		 ]]></value>
+		</property>
+	</bean>
+	
+	<!-- 增加CustomerDayScore的sql -->
+	<bean id="customer_day_score_insert_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+				   INSERT INTO customer_day_score (
+									`customerId`,
+									`day`,
+									`addScore`,
+									`reducedScore`,
+									`totleScore`,
+									`registeredScore`,
+									`certifiedScore`,
+									`assureScore`,
+									`payScore`,
+									`carTimeScore`,
+									`refereeScore`,
+									`beRefereeScore`,
+									`peccancyScore`,
+									`damageScore`,
+									`createdTime`
+					)
+					VALUES
+						(
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?,
+										?
+						)
+		 ]]></value>
+		</property>
+	</bean>
+		
+	<!-- 修改CustomerDayScore的sql -->
+	<bean id="customer_day_score_update_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		UPDATE customer_day_score
+			SET 
+						customerId = ?,
+						day = ?,
+						addScore = ?,
+						reducedScore = ?,
+						totleScore = ?,
+						registeredScore = ?,
+						certifiedScore = ?,
+						assureScore = ?,
+						payScore = ?,
+						carTimeScore = ?,
+						refereeScore = ?,
+						beRefereeScore = ?,
+						peccancyScore = ?,
+						damageScore = ?,
+						createdTime = ?
+			WHERE
+				id = ?
+		 ]]></value>
+		</property>
+	 </bean>
+	 
+	 
+	 
+	 <!-- 删除CustomerDayScore的sql  -->
+	<bean id="customer_day_score_delete_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		delete from customer_day_score where id=?
+		 ]]></value>
+		</property>
+	</bean>
+	
+	
+
+	
+	
+      
+ </beans>

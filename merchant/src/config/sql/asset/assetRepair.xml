@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 固定资产维修信息查询SQL -->
+	<bean id="REPAIR_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select r.*,c.manufacturerName from merchant_assets_repair r
+      		left join car_manufacturer c on (r.manufacturerId = c.id) where 1=1  
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and r.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="applyUser" />
+					<property name="value" value="and r.applyUser like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.repairDate >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.repairDate <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY r.id desc " />
+	</bean>
+	
+	<!-- 固定资产维修详细信息查询SQL -->
+	<bean id="REPAIR_DETAIL_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select d.*,a.assetsName,a.model,a.unit,c.name
+      		from merchant_assets_repair_detail d
+      		inner join merchant_assets_repair r on (d.repairId = r.id)
+      		left join merchant_assets a on (a.id = d.assetsId) 
+      		left join merchant_assets_category c on (a.categoryId = c.id) 
+      		where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="repairId" />
+					<property name="value" value="and d.repairId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="categoryId" />
+					<property name="value" value="and a.categoryId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="assetsName" />
+					<property name="value" value="and a.assetsName like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY d.id desc " />
+	</bean>
+
+</beans>

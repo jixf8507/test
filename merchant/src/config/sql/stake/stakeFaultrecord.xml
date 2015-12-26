@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 充电故障查询SQL -->
+	<!-- select r.factoryNo,r.sTime,r.eTime,f.faultMsg,d.deviceNo,s.siteName 
+      		from  stake_fault_record r,stake_faultinfo f,stake_devicename d,site s 
+			where r.faultNo=f.faultNo and r.factoryNo=d.factoryNo and d.site_code=s.id -->
+	<bean id="stake_faultrecord_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			select r.factoryNo,r.sTime,r.eTime,r.grooveNo,r.NewFaultNo,r.faultNo,d.deviceNo,s.siteName 
+      		from stake_fault_record r,stake_devicename d,site s 
+			where r.factoryNo=d.factoryNo and d.site_code=s.id
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="factoryNo" />
+					<property name="value" value="and r.factoryNo like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and d.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and d.site_code=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and r.sTime >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and r.eTime <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by r.id desc " />
+	</bean>
+
+
+			<!-- select f.faultMsg,count(*) num 
+      		from stake_fault_record r,stake_faultinfo f,stake_devicename d 
+      		where r.faultNo=f.faultNo and r.factoryNo=d.factoryNo --> 
+	<bean id="stake_faultrecord_statistics_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select count(*) cs,r.faultNo 
+      		from stake_fault_record r,stake_devicename d 
+      		where r.factoryNo=d.factoryNo 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and d.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and d.site_code=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and r.sTime >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and r.eTime <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="GROUP BY r.faultNo " />
+	</bean>
+
+</beans>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 查询充电套餐SQL -->
+	<bean id="STAKE_PRICE_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select p.* from stake_peakvalleyprice p where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and p.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and p.name like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and DATE_FORMAT(p.createdTime,'%Y-%m-%d') >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and DATE_FORMAT(p.createdTime,'%Y-%m-%d') <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value=" ORDER BY id desc " />
+	</bean>
+
+</beans>

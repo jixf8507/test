@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="coupon_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+					  SELECT
+							co.couponName,
+							co.balance,
+							co.`status`,
+							co.id,
+							co.couponNo,
+							co.createdTime,
+							co.toDate,
+							co.describe,
+							co.couponType,
+							c.`name`,
+							c.phone
+						FROM
+							coupon co left join customer c on co.customerId = c.id
+							
+						WHERE
+							1 = 1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and  co.merchantId=? " />
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="couponName" />
+					<property name="value" value="and  co.couponName like ? " />
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and  co.`status`=? " />
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="couponNo" />
+					<property name="value" value="and  co.couponNo like ? " />
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="id" />
+					<property name="value" value="and  co.id=? " />
+				</bean>		
+				
+						
+			</list>
+		</property>
+		<property name="order" value="order by co.id desc" />
+	</bean>
+	
+</beans>

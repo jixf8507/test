@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 车辆查询SQL -->
+	<bean id="car_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.id,c.carNumber,c.color,c.describe,c.chargeDuration,c.littleIcon,c.createdTime,c.status,c.flag,c.vin,c.soc,c.kms,
+      		ct.typeName,cm.manufacturerName,si.siteName,d.deviceNO,d.`status` as deviceStatus,o.orderType
+      		,d.surplusKms as dsurplusKms,d.curKms,c.surplusKms as csurplusKms
+      		from car c inner join car_type ct on c.carTypeId = ct.id inner join car_manufacturer cm on 
+      		ct.carManufacturerId = cm.id inner join site si on si.id = c.curSiteId left join car_device d on d.carId=c.id and d.carTableName='car' 
+      		left join `order` o on o.carId=c.id and o.orderStatus not in ('已取消','已付费') and o.returnCarConfirm != '已关门'
+      		where 1=1	
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and c.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and c.status =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderType" />
+					<property name="value" value="and o.orderType =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and c.flag =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="vin" />
+					<property name="value" value="and c.vin like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="curSiteId" />
+					<property name="value" value="and c.curSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carTypeId" />
+					<property name="value" value="and c.carTypeId=? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by c.id desc " />
+	</bean>
+	
+	<!-- 车辆查询SQL -->
+	<bean id="ONLY_CAR_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.id,c.carNumber,c.color,c.describe,c.chargeDuration,c.littleIcon,c.createdTime,c.status,
+      		c.flag,c.vin,ct.typeName,cm.manufacturerName,si.siteName,d.deviceNO,d.`status` as deviceStatus,
+      		c.soc,c.kms,c.surplusKms as csurplusKms,d.surplusKms as dsurplusKms,d.curKms from car c 
+      		inner join car_type ct on c.carTypeId = ct.id 
+      		inner join car_manufacturer cm on ct.carManufacturerId = cm.id 
+      		inner join site si on si.id = c.curSiteId 
+      		left join car_device d on d.carId=c.id and d.carTableName='car' where 1=1	
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and c.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carId" />
+					<property name="value" value="and c.id =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and c.status =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and c.flag =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="vin" />
+					<property name="value" value="and c.vin like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="curSiteId" />
+					<property name="value" value="and c.curSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carTypeId" />
+					<property name="value" value="and c.carTypeId=? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by c.id desc " />
+	</bean>
+
+	<bean id="car_no_device_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.id,c.carNumber,c.curSiteId,d.id as deviceId
+      		from car c LEFT JOIN car_device d on d.carId=c.id where 1=1	
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and c.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and c.curSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="deviceId" />
+					<property name="value" value="and (d.carId is null or d.id =? )" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by c.id desc " />
+	</bean>
+
+	<!-- 统计车辆的使用情况 -->
+	<bean id="car_use_statistics_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.carNumber,t.typeName,m.manufacturerName,sum(o.totalCost) cost,sum(o.kmsForReturn-o.kmsForGet) ksm ,count(*) cs
+			from car c INNER JOIN `order` o on o.carId=c.id and o.orderStatus ='已付费' LEFT JOIN car_type t on c.carTypeId=t.id LEFT JOIN car_manufacturer m on t.carManufacturerId=m.id 
+			where 1=1
+				
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value="GROUP BY c.carNumber,t.typeName,m.manufacturerName ORDER BY cs desc " />
+	</bean>
+
+
+	<!-- 车辆设备查询SQL -->
+	<bean id="car_device_monitor_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.curSiteId,c.`status`,d.carId,d.`status` dStatus 
+      		from car c LEFT JOIN car_device d on d.carId=c.id where c.flag='正常'
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and c.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and c.curSiteId=? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by c.id desc " />
+	</bean>
+
+	<bean id="car_position_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.id,c.curSiteId,c.carNumber,d.lng,d.lat,d.deviceNO,c.kms,c.littleIcon,d.currentCarStatus,
+			d.surplusKms,d.curKms,d.soc,si.siteName
+      		from vs_cars c INNER JOIN car_device d on d.carId=c.id and d.carTableName=c.carTableName 
+      		inner join site si on si.id = c.curSiteId 
+      		where c.flag!='删除'
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and d.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and c.curSiteId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carId" />
+					<property name="value" value="and c.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by c.id desc " />
+	</bean>
+
+</beans>

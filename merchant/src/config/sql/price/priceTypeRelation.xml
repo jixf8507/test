@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 分时套餐查询SQL -->
+	<bean id="price_type_relation_select_by_carid_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select pt.id,pt.typeName,cpr.priceTypeId 
+			from vs_price_type pt inner JOIN car_price_type_relation cpr 
+			on (cpr.priceTypeId=pt.id and cpr.priceTypeTableName=? and cpr.carId=?) 
+			where pt.flag!='删除' and pt.merchantId=? order by pt.id
+		 ]]></value>
+		</property>
+	</bean>
+	<!-- 分时套餐查询SQL -->
+	<bean id="price_type_relation_left_select_by_carid_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select pt.id,pt.typeName,cpr.priceTypeId 
+			from vs_price_type pt left JOIN car_price_type_relation cpr 
+			on (cpr.priceTypeId=pt.id and pt.priceTypeTableName=? and cpr.carId=?) 
+			where pt.flag!='删除' and pt.priceTypeTableName=? and pt.merchantId=? order by pt.id
+		 ]]></value>
+		</property>
+	</bean>
+
+</beans>

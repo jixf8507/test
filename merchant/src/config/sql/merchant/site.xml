@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="site_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.id,s.siteName,s.phone,s.address,s.flag,s.principal,s.lat,s.lng,s.createdTime ,s.type,s.imgUrl,s.province,s.city,
+      		(select count(*) from stake_devicename d where d.site_code = s.id) as stakeCount
+      		from site s where flag!='删除'
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and  s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteName" />
+					<property name="value" value="and s.siteName like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="province" />
+					<property name="value" value="and s.province =  ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="city" />
+					<property name="value" value="and s.city = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value">
+						<value><![CDATA[
+				      		and (s.type & ?) != 0
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by s.id desc" />
+	</bean>
+	
+	<!-- 分页查询type为租赁点（type & 1 ==1）的租赁点 -->
+	<bean id="site_select_by_type_sql" class="com.qx.common.sql.JSONSqlMapping">
+	<property name="select">
+		<value><![CDATA[
+	    		select s.id,s.siteName,s.phone,s.address,s.flag,s.principal,s.lat,s.lng,s.createdTime ,s.type,s.imgUrl,s.province,s.city
+	    		from site s where flag!='删除' and (s.type & 1) =1
+	 ]]></value>
+	</property>
+	<property name="conditions">
+		<list>
+			<bean class="com.qx.common.sql.Condition">
+				<property name="key" value="merchantId" />
+				<property name="value" value="and  s.merchantId=? " />
+			</bean>
+			<bean class="com.qx.common.sql.Condition">
+				<property name="key" value="siteId" />
+				<property name="value" value="and s.id=? " />
+			</bean>
+			<bean class="com.qx.common.sql.Condition">
+				<property name="key" value="siteName" />
+				<property name="value" value="and s.siteName like ? " />
+			</bean>
+			<bean class="com.qx.common.sql.Condition">
+				<property name="key" value="province" />
+				<property name="value" value="and s.province =  ? " />
+			</bean>
+			<bean class="com.qx.common.sql.Condition">
+				<property name="key" value="city" />
+				<property name="value" value="and s.city = ? " />
+			</bean>
+			<bean class="com.qx.common.sql.Condition">
+				<property name="key" value="type" />
+				<property name="value">
+					<value><![CDATA[
+			      		and (s.type & ?) != 0
+					 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by s.id desc" />
+	</bean>
+
+	<!-- 租赁点租赁收费统计 -->
+	<bean id="site_cost_statistics_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.id,s.type,s.siteName,g.getCount,r.returnCount,r.totalCost from site s 
+      		LEFT JOIN (select o.relityGetSiteId,count(*) getCount from `order` o where o.orderStatus='已付费' group BY o.relityGetSiteId) g on g.relityGetSiteId =s.id 
+			LEFT JOIN  (select o.relityReturnSiteId,count(*) returnCount,SUM(totalCost) totalCost from `order` o where o.orderStatus='已付费' group BY o.relityReturnSiteId) r on r.relityReturnSiteId=s.id
+			where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and  s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteName" />
+					<property name="value" value="and s.siteName like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="type" />
+					<property name="value">
+						<value><![CDATA[
+				      		and (s.type & ?) != 0
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="group by s.id order by s.id desc" />
+	</bean>
+
+</beans>

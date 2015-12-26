@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 车辆型号查询SQL -->
+	<bean id="car_manufacturer_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select cm.id,cm.manufacturerName,cm.fullName,cm.address,cm.linkman,cm.linkphone,cm.email,cm.merchantId 
+      		from car_manufacturer cm where 1=1	
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and cm.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="manufacturerName" />
+					<property name="value" value="and cm.manufacturerName like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by cm.id desc  " />
+	</bean>
+
+</beans>

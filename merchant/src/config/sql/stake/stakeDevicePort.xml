@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 车辆查询SQL -->
+	<bean id="stake_device_port_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select p.grooveNo,p.memo,p.currents,p.name,p.factoryNo,d.site_code from stake_deviceport p INNER JOIN stake_devicename d on p.factoryNo=d.factoryNo where 1=1  		 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="factoryNo" />
+					<property name="value" value="and p.factoryNo=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="pos" />
+					<property name="value" value="and p.pos=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and d.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and d.site_code=?" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by p.portorder " />
+	</bean>
+
+</beans>

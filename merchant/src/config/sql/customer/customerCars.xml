@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 商家用户查询SQL -->
+	<bean id="customer_cars_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select cc.id,cc.carNumber,cc.carType,c.phone,c.`name`,c.idCard,c.sex,d.deviceNO ,cc.vin
+      		from customer_cars cc INNER JOIN customer c on cc.customerId =c.id INNER JOIN account a on a.customerId=c.id and a.`status` ='正常'
+      		LEFT JOIN car_device d on d.carId=cc.id and d.carTableName='customer_cars' 
+      		where cc.flag='使用' 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId = ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and cc.carNumber like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="vin" />
+					<property name="value" value="and cc.vin like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="customerId" />
+					<property name="value" value="and cc.customerId = ?" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY cc.id desc " />
+	</bean>
+
+</beans>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 车载设备查询SQL -->
+	<bean id="car_device_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select d.*,c.carNumber,c.customerName,c.phone,s.simCard,s.id as simId
+      		from car_device d LEFT JOIN vs_cars c on d.carId=c.id and c.carTableName=d.carTableName 
+      		left join sim s on (s.deviceId=d.id) where 1=1      		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and d.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="currentCarStatus" />
+					<property name="value" value="and d.currentCarStatus=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and d.status=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carTableName" />
+					<property name="value" value="and d.carTableName=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="deviceNO" />
+					<property name="value" value="and d.deviceNO like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by d.id desc" />
+	</bean>
+
+	<!-- 车载设备卡查询SQL -->
+	<bean id="car_device_sim_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.*,d.deviceNO,c.carNumber,d.carTableName from sim s LEFT JOIN car_device d on d.id=s.deviceId 
+      		LEFT JOIN vs_cars c on d.carId=c.id and c.carTableName=d.carTableName where 1=1      		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and s.status=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="deviceNO" />
+					<property name="value" value="and d.deviceNO like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="simCard" />
+					<property name="value" value="and s.simCard like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by s.id desc" />
+	</bean>
+
+</beans>

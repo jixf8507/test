@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 订单查询SQL -->
+	<bean id="order_peccancyRecord_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		SELECT
+			pr.id,
+			pr.address,
+			pr.info,
+			pr.payCost,
+			pr.payStatus,
+			pr.checkMan,
+			pr.orderId,
+			ci.`name`,
+			ci.phone,
+			car.carNumber,
+			peccancyTime
+			FROM
+				order_peccancy_record pr LEFT JOIN `order` o on pr.orderId = o.id
+ 				LEFT JOIN customer ci  on  o.customerId = ci.id
+				LEFT JOIN  car car  on  o.carId = car.id
+	
+			WHERE
+	  		1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="payStatus" />
+					<property name="value" value="and pr.payStatus = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and car.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and ci.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+			      		and pr.peccancyTime >= ?
+					 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+			      		and pr.peccancyTime <= ?
+					 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by pr.id desc " />
+	</bean>
+
+
+	<!-- 根据用户上传文件进行订单查询SQL -->
+	<bean id="Select_Is_Exist_Order" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		SELECT
+				o.id,o.schemingGetTime,o.schemingReturnTime
+			FROM
+				`order` o LEFT JOIN car c on o.carId=c.id
+			
+			WHERE 
+				1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="AND c.carNumber=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="time" />
+					<property name="value">
+						<value><![CDATA[
+			      		AND o.schemingGetTime < ?
+					 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="time" />
+					<property name="value">
+						<value><![CDATA[
+			      		AND o.schemingReturnTime >?
+					 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by o.id desc " />
+	</bean>
+
+	<!-- 查询两次以上违章的人员 SQL -->
+	<bean id="peccancyRecord_Send_Message_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      	SELECT
+			a.merchantId,
+			a.id AS accountId,
+			a.`status`,
+			c.phone,
+			COUNT(o.customerId) AS count
+		FROM
+			`order` o,
+			order_peccancy_record r,
+			customer c,
+			account a
+		WHERE
+			o.id = r.orderId
+		AND o.customerId = c.id
+		AND r.payStatus = "未处理"
+		AND c.id = a.customerId
+		AND a.merchantId = o.merchantId
+		AND a.`status` = "正常"
+		GROUP BY
+			o.merchantId,
+			a.id
+		HAVING
+			COUNT(o.customerId) >= 2 
+
+		 ]]></value>
+		</property>
+	</bean>
+	
+
+</beans>

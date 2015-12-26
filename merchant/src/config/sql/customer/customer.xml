@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 商家用户查询SQL -->
+	<bean id="customer_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.id,c.idCard,c.name,c.phone,c.sex,a.status,c.address,a.balance,a.moneyOfassure,a.cardNO,a.describe,r.enterpriseId,cc.enterpriseName,
+      		a.id as accountId ,a.subStatus,a.bankCardNO,a.bankType,a.transactUser,s.siteName,a.createdTime,a.deletedUser,a.deletedTime,c.moneyOfassure as cmoneyOfassure
+      		from customer c inner join account a on a.customerId=c.id  left join site s on a.siteId =s.id
+      		left join enterprise_customer_relation r on (r.customerId=c.id)
+      		left join merchant_enterprise_customer cc on (r.enterpriseId=cc.id)
+			where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and a.status = ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="notStatus" />
+					<property name="value" value="and a.status!=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="(subStatus" />
+					<property name="value" value=" and (a.subStatus = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="or subStatus)" />
+					<property name="value" value=" or a.subStatus = ?) " />
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="subStatus" />
+					<property name="value" value=" and a.subStatus = ? " />
+				</bean>
+				
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="noStatus" />
+					<property name="value" value="and a.status != ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and a.siteId = ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="delBeginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.deletedTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="delEndTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.deletedTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="noUse" />
+					<property name="value"
+						value="and not EXISTS (select o.id from `order` o where o.customerId=c.id and o.orderStatus not in ('已付费','已取消')  and o.merchantId=a.merchantId) and 'yes'=?" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY a.id desc   " />
+	</bean>
+
+	<!-- 商家潜在用户查询SQL -->
+	<bean id="customer_potential_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.id,c.idCard,c.name,c.phone,c.sex,c.address
+      		from customer c where (c.status='已通过' or c.status='审核中')
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="idCard" />
+					<property name="value" value="and c.idCard like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and c.name like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and c.phone like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value">
+						<value><![CDATA[
+							and not EXISTS ( select id from account a where a.merchantId=? and a.customerId=c.id and a.status!='注销') 
+			      		]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY c.id desc   " />
+	</bean>
+
+
+	<!-- 租赁点租赁统计 -->
+	<bean id="customer_statistics_site_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.id,s.siteName, count(*) cs from customer c INNER JOIN account a on a.customerId=c.id INNER JOIN site s on a.siteId=s.id 
+			where 1=1					
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.`status`= ? ]]>
+						</value>
+					</property>
+				</bean>
+				
+			</list>
+		</property>
+		<property name="order" value="GROUP BY s.id,s.siteName" />
+	</bean>
+	
+	<!-- 租赁点注销卡统计 -->
+	<bean id="customer_statistics_site_cancle_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.id,s.siteName, count(*) cs from customer c INNER JOIN account a on a.customerId=c.id  INNER JOIN site s on a.siteId=s.id 
+			where 1=1				
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.deletedTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.deletedTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.`status`= ? ]]>
+						</value>
+					</property>
+				</bean>
+				
+						
+			</list>
+		</property>
+		<property name="order" value="GROUP BY s.id,s.siteName" />
+	</bean>
+	
+	<!-- 每天办卡统计 -->
+	<bean id="customer_statistics_day_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select DATE_FORMAT(a.createdTime,'%Y-%m-%d') day, count(*) cs from customer c INNER JOIN account a on a.customerId=c.id and a.`status`='正常' INNER JOIN site s on a.siteId=s.id 
+			where s.flag!='删除'  		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value="GROUP BY DATE_FORMAT(a.createdTime,'%Y-%m-%d') ORDER BY day" />
+	</bean>
+
+</beans>

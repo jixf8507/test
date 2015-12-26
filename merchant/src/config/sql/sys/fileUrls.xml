@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 查找操作订单时审核图片的SQL -->
+	<bean id="sys_fileurls_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.id,s.tableId,s.tableName,s.fileType,s.fileUrl,s.fileName from sys_file_urls s 
+      		inner join order_images o on (o.fileId=s.id) where  1=1  			
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="tableId" />
+					<property name="value" value="and o.orderId = ? " />
+				</bean>
+				<!-- <bean class="com.qx.common.sql.Condition">
+					<property name="key" value="tableName" />
+					<property name="value" value="and s.tableName =?" />
+				</bean> -->
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="fileType" />
+					<property name="value" value="and o.type=? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY s.id desc " />
+	</bean>
+
+	<!-- 查找车辆图片的SQL -->
+	<bean id="CAR_IMG_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		SELECT i.*,u.tableId,u.tableName,u.fileType,u.fileUrl,u.fileName 
+      		FROM car_images i inner join sys_file_urls u on (i.fileId=u.id) where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carId" />
+					<property name="value" value="and i.carId = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="fileType" />
+					<property name="value" value="and u.fileType = ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY i.id desc " />
+	</bean>
+
+</beans>

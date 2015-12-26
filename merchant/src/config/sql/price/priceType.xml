@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 收费套餐查询SQL -->
+	<bean id="price_pricetype_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select t.* from wh_hours_price_type t where 1=1			
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and t.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and t.flag =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="typeName" />
+					<property name="value" value="and t.typeName like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by t.id desc  " />
+	</bean>
+
+	<!-- 长租收费套餐查询SQL -->
+	<bean id="longPrice_pricetype_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select t.id,t.typeName,t.monthFee,t.dayFee,t.hourFee,t.flag
+      		from month_lease_price_type t where 1=1			
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and t.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and t.flag =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="typeName" />
+					<property name="value" value="and t.typeName like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by t.id desc  " />
+	</bean>
+
+</beans>

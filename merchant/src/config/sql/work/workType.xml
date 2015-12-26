@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 查询所有的工单类型SQL -->
+	<bean id="work_Type_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			SELECT
+				mt.id,
+				mt.typeName,
+				mt.createdTime,
+				mt.workDes,
+				mu.id as userId,
+				mu.userName,
+				mu.mobilePhone
+			FROM
+				merchant_work_type  mt
+			JOIN merchant_user mu ON mt.userId = mu.id
+			where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and mu.merchantId = ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="typeName" />
+					<property name="value" value="and mt.typeName like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="userName" />
+					<property name="value" value="and mu.userName like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="mobilePhone" />
+					<property name="value" value="and mu.mobilePhone like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and mt.createdTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and mt.createdTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY mt.id desc   " />
+	</bean>
+
+
+
+	<!-- 根据ID查找工单类型的sql -->
+	<bean id="select_type_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			SELECT
+				mt.typeName,
+				mt.workDes,
+				mt.userId,
+ 				mu.userName,
+ 				mu.mobilePhone
+			FROM
+				merchant_work_type mt
+			LEFT join  merchant_user  mu on mt.userId=mu.id  
+			where  mt.id=?
+		 ]]></value>
+		</property>
+	</bean>
+
+
+	<!-- 查询所有的负责人 -->
+	<bean id="work_User_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			SELECT
+ 				 mu.userName,
+				 mu.email,
+				 mu.id,
+	             mu.merchantId,
+	             mu.mobilePhone,
+	             mu.rights,
+	             mu.`status`,
+                 s.siteName as siteName
+            FROM
+	             merchant_user mu
+                 LEFT JOIN site s ON mu.siteId = s.id
+                 where  mu.`status`="正常" 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="email" />
+					<property name="value" value="and mu.email like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="userName" />
+					<property name="value" value="and mu.userName like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="mobilePhone" />
+					<property name="value" value="and mu.mobilePhone like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and mu.merchantId like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="rights" />
+					<property name="value" value="and mu.rights = ?" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY mu.id asc   " />
+	</bean>
+
+	<!-- 新增工单类型的sql语句 -->
+	<bean id="work_type_insert_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			INSERT INTO merchant_work_type (`typeName`,`workDes`,`userId`,`createdTime`) VALUES (?,?,?,?)
+		 ]]></value>
+		</property>
+	</bean>
+
+	<!-- 保存工单类型修改的sql语句 -->
+	<bean id="work_type_update_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			update `merchant_work_type` set typeName=?,workDes=?,userId=? where id=? 	
+		 ]]></value>
+		</property>
+	</bean>
+
+	<!-- 删除工单记录类型的sql语句 -->
+	<bean id="work_Type_delete_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+			delete  from merchant_work_type where id=? 	
+		 ]]></value>
+		</property>
+	</bean>
+
+
+</beans>

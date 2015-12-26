@@ -1,0 +1,234 @@
+@CHARSET "UTF-8";
+
+ul{
+	list-style: none;
+}
+
+li{
+	display: inline;	
+}
+
+.fieldset {
+	margin: 0 auto;
+	margin-left:2px;
+	margin-top:2px;
+	width: 98%;
+	height: auto;
+	font-size: 14px;
+	font-weight: bold;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	border: 1px;
+}
+
+.fieldset ul{
+	width: 100%;
+	padding: 0;
+	margin: 0 auto;
+}
+
+.fieldset li{	
+	margin:0px;
+	margin-left:4px;
+	margin-top:4px;
+	width: 200px;
+	height: 206px;
+	display: inline;
+	float: left;	
+}
+
+
+
+.item{
+	width:190px;
+	height: 206px;
+	text-align: center;
+}
+
+
+
+.main_img{
+	margin:10px;
+	width: 94px;
+	height: 94px;
+	border: none;
+}
+
+.title{
+	width: 150px;
+	height: 30px;
+	line-height: 30px;	
+}
+
+.title img{
+	margin-top: 5px;
+	margin-left:20px;
+	width: 20px;
+	height: 20px;
+	float: left;
+	
+}
+
+.item h3{
+	width: 100px;
+	height: 30px;	
+	line-height:30px;
+	margin: 0 auto;
+	margin-left:10px;
+	text-align: left;
+	font-size: 12px;
+	color:#344b50;
+	float: left;
+}
+
+.item p{
+	width: 150px;
+	height: 20px;
+	line-height:20px;
+	margin: 0 auto;
+	padding:0px;
+	padding-left:20px;
+	text-align: left;
+	font-size: 12px;
+	font-weight: normal;
+	color:#344b50;
+}
+
+.online{
+	color:#0044ff;
+}
+
+.outline{
+	color:#ff0000;	
+}
+
+.other{
+	color:#FFCC66;	
+}
+
+.line-l{
+	margin:0 auto;
+	padding:6px;	
+	height: 200px;
+	width: 48%;
+	float: left;	
+	text-align: center;
+}
+
+.line-r{
+	margin:0 auto;
+	padding:6px;
+	height: 200px;
+	width: 48%;
+	float: right;		
+	text-align: center;
+}
+
+
+#main {
+	width: 100%;
+	border-color: #ededed;
+	border-top-color: #fff;
+}
+
+.list_content {
+	width: 100%;
+	height: auto;
+	margin: 0 auto;
+}
+
+.tr_header {
+	width: 100%;
+	background:
+		url("../js/Ext/resources/images/default/grid/grid3-hrow.gif");
+}
+
+.list_content th {
+	text-align: left;
+	height: 24px;
+	line-height: 24px;
+	border-right-color: #d0d0d0;
+	border-left-color: #eee;
+	border-right-color: #d0d0d0;
+}
+
+.STYLE10 {
+	color: #000000;
+	font-size: 14px;
+	padding: 0;
+	padding-left: 6px;
+}
+
+.list_content td {
+	height: 24px;
+	line-height: 24px;
+}
+
+.STYLE19 {
+	padding: 0;
+	padding-left: 6px;
+	color: #344b50;
+	font-size: 14px;
+	color: #344b50;
+}
+
+.STYLE20 {
+	padding: 0;
+	padding-right: 6px;
+	color: #344b50;
+	font-size: 14px;
+}
+
+.td_index {
+	text-align: right;
+	background:
+		url("../js/Ext/resources/images/default/grid/grid3-special-col-bg.gif")
+		;
+}
+
+.monitoer_item{
+	width: 300px;
+	height: 250px;
+	margin:0;	
+	margin:16px;
+	
+	float: left;
+}
+
+.monitoer_item .icon{
+	width: 60px;
+	height: 200px;
+	padding-top:10px;
+	padding-left:20px;
+	float: left;
+}
+
+.monitoer_item .ports{
+	height: 200px;
+	padding-top:10px;
+	padding-left:10px;
+	float: left;
+}
+
+.monitoer_item .ports p{
+	margin:0 auto;
+	margin-top: 10px;
+}
+
+
+.monitoer_item .ports label,.monitoer_item .ports span{	
+	padding-left:20px;
+	
+}
+
+.monitoer_item .ports .hd{
+	color: #c3c3c3;
+	font-weight: bold;
+}
+
+.monitoer_item .name{	
+	padding-top:10px;
+	margin:0 auto ;
+	font-size: 16px;
+	text-align: center;
+}

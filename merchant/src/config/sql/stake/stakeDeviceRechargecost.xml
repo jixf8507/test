@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 充电收费记录查询SQL -->
+	<bean id="stake_chargerecost_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select r.id,r.Kind,r.factoryNo,r.deviceNo,r.chargePosition,r.cardID,r.startSoc,r.endSoc,a.cardNO,r.recordTime,
+      		r.startCharge,r.lastCharge,r.chargingTime,r.EQ,r.cost,r.CarNo,r.orderStatus,s.siteName,c.`name`,c.phone 
+			from stake_rechargecost r LEFT JOIN site s on r.site_code=s.id LEFT JOIN customer c on r.customerId=c.id 
+			LEFT JOIN account a on a.customerId=c.id and a.merchantId=r.merchantId and a.`status`!='注销' 
+			where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="factoryNo" />
+					<property name="value" value="and r.factoryNo like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="CarNo" />
+					<property name="value" value="and r.CarNo like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and r.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and r.site_code=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="orderStatus" />
+					<property name="value" value="and r.orderStatus=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.recordTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.recordTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by r.id desc " />
+	</bean>
+
+</beans>

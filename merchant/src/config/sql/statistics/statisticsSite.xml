@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 统计租赁点的租赁次数SQL -->
+	<bean id="statistics_site_hour_count_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select v.h,v.type,count(*) cs from vs_site_lease_count v where  1=1  			
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and v.merchantId =? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="day" />
+					<property name="value" value="and v.day = ? " />
+				</bean>
+					<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and v.day >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and v.day <=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and v.transactUser like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and v.siteId=? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="GROUP BY v.h,v.type  " />
+	</bean>
+	
+	
+	<!-- 租赁点分时段租赁次数统计 -->
+	<bean id="STATISTICS_SITE_TIME_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.realityGetTime beginTime,o.realityReturnTime endTime,s.siteName from site s,`order` o 
+			where s.id=o.relityReturnSiteId and o.orderStatus='已付费' and o.realityGetTime != '' and o.realityReturnTime !=''  					
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY o.id" />
+	</bean>
+	
+	<!-- 租赁点租赁类型次数统计 -->
+	<bean id="STATISTICS_SITE_TYPE_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select TIMESTAMPDIFF(hour,o.realityGetTime,o.realityReturnTime) as hours,count(*) as cs from site s,`order` o 
+			where s.id=o.relityReturnSiteId and o.orderStatus='已付费' and o.realityGetTime != '' and o.realityReturnTime !='' and o.orderType = 1  					
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="GROUP BY hours" />
+	</bean>
+	
+</beans>

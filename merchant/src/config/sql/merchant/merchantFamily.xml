@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+       
+     <!-- 条件查询MerchantFamily的sql-->
+	<bean id="merchant_family_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+				  SELECT
+						mf.id,
+						mf.householder,
+						mf.homePhone,
+						mf.homeAddress,
+						mf.createdTime,
+						mf.customerId,
+						mf.merchantId,
+						mf.`status`,
+						a.balance,
+						a.moneyOfassure
+					FROM
+						merchant_family mf
+						LEFT JOIN customer c ON mf.customerId=c.id
+						LEFT JOIN account a ON a.customerId=c.id  and a.merchantId=mf.merchantId
+					WHERE
+						1 = 1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="id" />
+								<property name="value" value=" and mf.id = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="householder" />
+								<property name="value" value=" and mf.householder like ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="homeAddress" />
+								<property name="value" value=" and mf.homeAddress like ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="homePhone" />
+								<property name="value" value=" and mf.homePhone like ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="customerId" />
+								<property name="value" value=" and mf.customerId = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="merchantId" />
+								<property name="value" value=" and mf.merchantId = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="status" />
+								<property name="value" value=" and mf.`status` = ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="no_aStatus" />
+								<property name="value" value=" AND a.`status` != ?" />
+						</bean>
+							<bean class="com.qx.common.sql.Condition">
+									<property name="key" value="beginTime" />
+									<property name="value">
+											<value>
+											<![CDATA[ and mf.createdTime >= ? ]]>
+											</value>
+									</property>
+							</bean>
+							<bean class="com.qx.common.sql.Condition">
+									<property name="key" value="endTime" />
+									<property name="value">
+											<value>
+											<![CDATA[ and mf.createdTime <= ? ]]>
+											</value>
+									</property>
+							</bean>
+			</list>
+		</property>
+		<property name="order" value="order by id desc " />
+	</bean>
+	
+	<!-- 根据ID查找MerchantFamily的sql -->
+	<bean id="merchant_family_get_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+					SELECT
+							mf.id,
+							mf.householder,
+							mf.homeAddress,
+							mf.homePhone,
+							mf.customerId,
+							mf.merchantId,
+							mf.createdTime,
+							mf.status
+					FROM
+						merchant_family mf	
+					WHERE
+					 mf.id = ?
+		 ]]></value>
+		</property>
+	</bean>
+	
+	<!-- 增加MerchantFamily的sql -->
+	<bean id="merchant_family_insert_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+				   INSERT INTO merchant_family (
+									`householder`,
+									`homeAddress`,
+									`homePhone`,
+									`customerId`,
+									`merchantId`,
+									`createdTime`
+					)
+					VALUES
+						(
+										?,
+										?,
+										?,
+										?,
+										?,
+										?
+						)
+		 ]]></value>
+		</property>
+	</bean>
+		
+	<!-- 修改MerchantFamily的sql -->
+	<bean id="merchant_family_update_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		UPDATE merchant_family
+			SET 
+						`householder` = ?,
+						`homeAddress` = ?,
+						`homePhone` = ?,
+						`customerId` = ?,
+						`merchantId` = ?,
+						`createdTime` = ?
+			WHERE
+				id = ?
+		 ]]></value>
+		</property>
+	 </bean>
+	 
+	 
+	 
+	 <!-- 删除MerchantFamily的sql  -->
+	<bean id="merchant_family_delete_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		delete from merchant_family where id=?
+		 ]]></value>
+		</property>
+	</bean>
+	
+	
+	<!-- 查找家庭的图片，一个家庭只有一张图片 -->
+	<bean id="merchant_family_img_get_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+					SELECT
+						*
+					FROM
+						sys_file_urls sfu
+					WHERE
+						sfu.tableName="merchant_family"
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+					<bean class="com.qx.common.sql.Condition">
+							<property name="key" value="tableId" />
+							<property name="value" value=" AND sfu.tableId= ? " />
+					</bean>
+						
+			</list>
+		</property>
+		<property name="order" value="ORDER BY sfu.createdTime DESC" />
+	</bean>
+	
+	
+	
+	<!-- 家庭成员列表分页查询 -->
+	<bean id="merchant_family_member_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+				SELECT
+					mfc.id mfc_id,
+					mfc.familyId,
+					mfc.customerId,
+					c.id,
+					c.idCard,
+					c.phone,
+					c.`name`,
+					c.address,
+					a.moneyOfassure,
+					a.balance,
+					a.`status`,
+					a.createdTime	
+				FROM
+					merchant_family_customer mfc
+				LEFT JOIN customer c ON c.id = mfc.customerId
+				LEFT JOIN account a ON a.customerId =c.id
+				WHERE
+	1 = 1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="merchantId" />
+								<property name="value" value=" AND a.merchantId= ? " />
+						</bean>
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="familyId" />
+								<property name="value" value=" AND mfc.familyId= ? " />
+						</bean>
+						
+						<bean class="com.qx.common.sql.Condition">
+								<property name="key" value="noStatus" />
+								<property name="value" value=" AND a.`status` !=? " />
+						</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY mfc.id" />
+	</bean>
+	
+	
+      
+ </beans>

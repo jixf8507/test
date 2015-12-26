@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 充电时间段统计SQL -->
+	<bean id="CHARGE_TIME_RECORD_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.startCharge,s.lastCharge,DATE_FORMAT(s.startCharge,'%H') h
+      		from stake_rechargecost s inner join site ss on (ss.id = s.site_code) where s.operateStatus ='充电中' 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.site_code=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and s.startCharge >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and s.lastCharge <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<!-- <property name="order" value=" group by DATE_FORMAT(s.startCharge,'%H')" /> -->
+	</bean>
+	
+	<!-- 充电方式统计SQL -->
+	<bean id="CHARGE_WAY_RECORD_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.Kind kind,DATE_FORMAT(s.recordTime,'%Y-%m') month,count(*) cs  
+      		from stake_rechargecost s where s.operateStatus='充电中' 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.site_code=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and s.recordTime >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and s.recordTime <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" group by kind,month" />
+	</bean>
+
+</beans>

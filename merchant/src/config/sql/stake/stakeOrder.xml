@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 超时订单查询SQL -->
+	<bean id="find_OutTime_Charge_Order_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select r.id,r.customerId from stake_rechargecost r 
+      		where r.orderStatus='预约中' and timestampdiff(hour,r.recordTime,now())>=24 
+		 ]]></value>
+		</property>
+		<property name="order" value="order by r.id desc " />
+	</bean>
+	
+	
+</beans>

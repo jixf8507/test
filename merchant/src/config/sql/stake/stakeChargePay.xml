@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 月充电收费统计SQL -->
+	<bean id="CHARGE_MONTH_PAY_RECORD_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select DATE_FORMAT(r.recordTime,'%Y-%m') month,sum(r.cost) cost,count(*) cs,s.siteName,sum(r.EQ) eq
+			from stake_rechargecost r LEFT JOIN site s on r.site_code=s.id where r.orderStatus='已付费'
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and DATE_FORMAT(r.recordTime,'%Y-%m-%d') >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and DATE_FORMAT(r.recordTime,'%Y-%m-%d') <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value=" GROUP BY DATE_FORMAT(r.recordTime,'%Y-%m') ORDER BY month " />
+	</bean>
+
+	<!-- 日充电收费统计SQL -->
+	<bean id="CHANGE_DAY_PAY_RECORD_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select DATE_FORMAT(r.recordTime,'%Y-%m-%d') day,sum(r.cost) cost,count(*) cs,s.siteName,sum(r.EQ) eq 
+			from stake_rechargecost r LEFT JOIN site s on r.site_code=s.id where r.orderStatus='已付费'
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and DATE_FORMAT(r.recordTime,'%Y-%m-%d') >=?
+						 ]]></value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value><![CDATA[
+				      		and DATE_FORMAT(r.recordTime,'%Y-%m-%d') <=?
+						 ]]></value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order"
+			value=" GROUP BY DATE_FORMAT(r.recordTime,'%Y-%m-%d') ORDER BY day " />
+	</bean>
+
+	<!-- 租赁点租赁收费统计 -->
+	<bean id="CHANGE_SITE_PAY_RECORD_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select s.siteName,count(*) cs,sum(r.cost) cost,sum(r.EQ) eq
+			from site s,stake_rechargecost r where s.id=r.site_code and r.orderStatus='已付费'					
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and DATE_FORMAT(r.recordTime,'%Y-%m-%d') >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and DATE_FORMAT(r.recordTime,'%Y-%m-%d') <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="GROUP BY s.siteName" />
+	</bean>
+
+	<!-- 租赁点不同充电方式充电电量统计 -->
+	<bean id="CHANGE_SITE_STAKE_KIND_RECORD_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select r.Kind,count(*) cs,sum(r.cost) cost,sum(r.EQ) eq
+			from site s,stake_rechargecost r where s.id=r.site_code and r.orderStatus='已付费'					
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and DATE_FORMAT(r.recordTime,'%Y-%m-%d') >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and DATE_FORMAT(r.recordTime,'%Y-%m-%d') <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="GROUP BY r.Kind" />
+	</bean>
+</beans>

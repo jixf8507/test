@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 车辆查询SQL -->
+	<bean id="stake_device_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select sd.*,ss.area_name,s.siteName,p.name  
+			from stake_deviceName sd left join stake_siteArea ss on sd.area_code = ss.area_code and sd.site_code = ss.site_code 
+			inner join site s on sd.site_code = s.id and sd.merchantId=s.merchantId left join stake_peakvalleyprice p on (p.id=sd.priceid) 
+			where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="isAllowParking" />
+					<property name="value" value="and sd.isAllowParking=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="isupdateprice" />
+					<property name="value" value="and sd.isupdateprice=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="deviceTypeNo" />
+					<property name="value" value="and sd.deviceTypeNo!=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and sd.status=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and sd.flag=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="factoryNo" />
+					<property name="value" value="and sd.factoryNo like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="nameplate" />
+					<property name="value" value="and sd.nameplate like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and sd.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and sd.site_code=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="parkType" />
+					<property name="value" value="and sd.parkType=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="priceid" />
+					<property name="value" value="and sd.priceid=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="deviceType" />
+					<property name="value" value="and sd.deviceType=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="noChildStake" />
+					<property name="value" value=" and sd.groupNo = sd.factoryNo and 'yes' = ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by sd.id desc " />
+	</bean>
+
+</beans>

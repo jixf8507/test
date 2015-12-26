@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 救援列表查询SQL -->
+	<bean id="order_resuce_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select r.id,r.info,r.address,r.phone,r.createdTime,c.carNumber,ci.name,r.checkUser,r.payCost,r.payStatus 
+      		from order_resuce_record r,`order` o ,customer ci,car c
+			where r.orderId = o.id  and o.customerId =ci.id and o.carId=c.id 			
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="payStatus" />
+					<property name="value" value="and r.payStatus=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="carNumber" />
+					<property name="value" value="and c.carNumber like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="phone" />
+					<property name="value" value="and ci.phone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="customerName" />
+					<property name="value" value="and ci.name like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="order by r.id desc  " />
+	</bean>
+
+</beans>

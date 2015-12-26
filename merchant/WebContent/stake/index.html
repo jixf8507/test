@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>泸州能投充电桩监控管理系统</title>
+<meta http-equiv="X-UA-Compatible" content="IE=8" ></meta>
+<link rel="stylesheet" href="css/base.css" />
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/base.js"></script>
+</head>
+<script>
+	$(document).ready(function() {
+		window.onresize = function() {
+			location.reload();
+		};
+	});
+</script>
+<body>
+	<div id="web_bg"
+		style="position: absolute; width: 100%; height: 100%; z-index: -1">
+		<img style="position: fixed;" src="img/bg.jpg" height="100%"
+			width="100%" />
+	</div>
+
+	<div class="login">
+		<div class="login_title">泸州能投充电桩监控管理系统</div>
+		<div class="login_form">
+			<ul>
+				<li>用户名：<input type="text" id="username"></li>
+				<li>密 码：<input type="password" id="password"></li>
+			</ul>
+			<div class="login_in">
+				<span><a href="javaScript:submit();" id="login_enter"></a></span><span><a
+					href="#" id="myform"></a></span>
+			</div>
+		</div>
+		<h5>版本号:V1.0<br><br>版权所有:泸州能投 安徽旗翔科技发展有限责任公司</h5>
+	</div>
+
+</body>
+</html>

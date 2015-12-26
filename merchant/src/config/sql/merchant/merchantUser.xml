@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 商家用户功能模块查询SQL -->
+	<bean id="merchant_user_moudles_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select m.id,m.moduleName,m.level ,m.pid,m.sort,m.menuCode,m.moduleUrl,m.icon 
+      		from merchant_modules  m  inner join merchant_user_modules um on um.moduleId=m.id and um.userId=?
+			where m.systemName=? 
+			order by m.level ,m.pid,m.sort
+		 ]]></value>
+		</property>
+	</bean>
+
+	<!-- 商家用户功能模块查询SQL -->
+	<bean id="merchant_user_moudles_join_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select m.id,m.moduleName,um.moduleId,m.level ,m.pid,m.sort from merchant_modules  m left join merchant_user_modules um  
+			on (um.moduleId=m.id and um.userId=?) where m.systemName=? order by m.level ,m.pid,m.sort
+		 ]]></value>
+		</property>
+	</bean>
+
+	<!-- 商家工作人员查询SQL -->
+	<bean id="merchant_user_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select u.id,u.email,u.mobilePhone,u.userName,u.rights,s.siteName
+      		from merchant_user u,site s
+      		where u.siteId=s.id and u.`status`!='删除'  		
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and u.siteId = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="right" />
+					<property name="value" value="and u.rights = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="email" />
+					<property name="value" value="and u.email like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="mobilePhone" />
+					<property name="value" value="and u.mobilePhone like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="userName" />
+					<property name="value" value="and u.userName like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY u.id DESC " />
+	</bean>
+
+	<!-- 商家工作人员签到查询SQL -->
+	<bean id="merchant_user_sign_select_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select u.userName,u.mobilePhone,DATE_FORMAT(us.inTime,'%H:%i:%s') inTime,us.siteId,us.outSiteId,
+      		DATE_FORMAT(us.outTime,'%H:%i:%s') outTime,us.id,us.inLat,us.inLng,us.outLat,us.outLng,
+      		us.inDescribe,us.outDescribe,us.singDate,us.status,s.siteName,ss.siteName as outSiteName 
+      		from merchant_user_sign us inner join merchant_user u on (us.userId = u.id) 
+      		inner join site s on (s.id = us.siteId) left join site ss on (ss.id = us.outSiteId)
+      		where 1=1	
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and s.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and (s.id = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="or ss.id = ?) " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="status" />
+					<property name="value" value="and us.status = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and us.singDate >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and us.singDate <= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and u.userName like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="mobilePhone" />
+					<property name="value" value="and u.mobilePhone like ? " />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY us.id DESC " />
+	</bean>
+
+	<!-- 商家工作人员查询SQL -->
+	<bean id="merchant_user_get_car_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.id,c.carNumber,s.siteName,o.realityGetTime,o.menForGet from `order` o 
+      		INNER join car c on o.carId=c.id 
+			INNER JOIN site s on o.relityGetSiteId=s.id  
+			where o.orderStatus!='已取消' and o.orderStatus!='已预约' and o.orderType=1	
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and o.menForGet like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="day" />
+					<property name="value" value="and o.realityGetTime like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityGetTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityGetTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY o.realityGetTime " />
+	</bean>
+
+	<!-- 商家工作人员查询SQL -->
+	<bean id="merchant_user_return_car_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select o.id,c.carNumber,s.siteName,o.realityReturnTime,o.menForReturn from `order` o 
+      		INNER join car c on o.carId=c.id 
+			INNER JOIN site s on o.relityGetSiteId=s.id 
+			where (o.orderStatus='已还车' or o.orderStatus='已付费') and o.orderType=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and o.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and o.menForReturn like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="day" />
+					<property name="value" value="and o.realityReturnTime like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and o.realityReturnTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY o.realityReturnTime " />
+	</bean>
+
+	<!-- 商家工作人员查询SQL -->
+	<bean id="merchant_user_create_customer_sql" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select c.phone,c.`name`,c.idCard,s.siteName,a.createdTime,a.transactUser 
+      		from account a INNER JOIN customer c on a.customerId=c.id 
+			LEFT JOIN site s on a.siteId=s.id 
+			where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and s.id = ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="name" />
+					<property name="value" value="and a.transactUser like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="day" />
+					<property name="value" value="and a.createdTime like ? " />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime >= ? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.createdTime <= ? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value="ORDER BY a.createdTime " />
+	</bean>
+
+</beans>

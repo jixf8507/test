@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title>LED2.0</title>
+<link href="css/base.css" type="text/css" rel="stylesheet" />
+<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+<script src="js/moment.min.js"></script>
+<!--[if IE]>
+<script type="text/javascript" src="js/excanvas.js" onload="explorercanvasload"></script>
+<![endif]-->
+<!-- <script type="text/javascript">
+var pathName=window.document.location.pathname;
+var contextPath = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+</script> -->
+<style type="text/css">
+body,html,#allmap {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	margin: 0;
+}
+
+#l-map {
+	height: 100%;
+	width: 78%;
+	float: left;
+	border-right: 2px solid #bcbcbc;
+}
+
+#r-result {
+	height: 100%;
+	width: 20%;
+	float: left;
+}
+</style>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/api?v=2.0&ak=hvAmVntuPfdU9zzuQvvR5PQq"></script>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+<script type="text/javascript"
+	src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+<script src="js/led.js" type="text/javascript"></script>
+</head>
+
+<body>
+	<div class="dt" id="allmap"></div>
+	<div class="time">
+		<div id="clock" class="light">
+			<div class="display">
+				<div class="date"></div>
+				<div class="digits"></div>
+			</div>
+		</div>
+	</div>
+	<div class="choose">
+		<ul>
+			<li style="border-bottom: 1px solid #b9b9b9"><div class="fb"></div>
+				<a href="#" class="d_c">租赁点分布</a><span class="c1" id="car_count">(91)</span></li>
+			<li style="border-bottom: 1px solid #b9b9b9"><div class="fb2"></div>
+				<a href="#" class="d_a">充电站分布</a><span class="c2" id="charge_count">(91)</span></li>
+			<li><div class="fb3"></div>
+				<a href="#" class="d_b">停车场分布</a><span class="c3"
+				id="merchant_count">(91)</span></li>
+		</ul>
+	</div>
+	<div class="bottom">
+		<ul>
+			<li style="border-right: 1px solid #616582">
+				<div class="show_img">
+					<img src="images/wq.png">
+				</div>
+				<div class="show_article">
+					<ul>
+						<li>今日减少：<span style="font-size: 24px;" id="wq_jt">60.23</span><span
+							style="color: #a1a1a1;">尾气排放</span></li>
+						<li>累计减少：<span style="font-size: 24px;" id="wq_all">3460.23</span><span
+							style="color: #a1a1a1;">尾气排放</span></li>
+					</ul>
+				</div>
+			</li>
+			<li
+				style="border-right: 1px solid #616582; border-left: 1px solid #616582">
+				<div class="show_img">
+					<img src="images/sy.png">
+				</div>
+				<div class="show_article" style="color: #fff;">
+					<ul>
+						<li>今日减少：<span style="font-size: 24px;" id="ry_jt">60.23</span><span
+							style="color: #a1a1a1;">燃油消耗</span></li>
+						<li>累计减少：<span style="font-size: 24px;" id="ry_all">3460.23</span><span
+							style="color: #a1a1a1;">燃油消耗</span></li>
+					</ul>
+				</div>
+			</li>
+			<li style="border-left: 1px solid #616582">
+				<div class="show_img">
+					<img src="images/money.png">
+				</div>
+				<div class="show_article" style="color: #31b6f0">
+					<ul>
+						<li>今日减少：<span style="font-size: 24px;" id="yf_jt">60.23</span><span
+							style="color: #a1a1a1;">油费支付</span></li>
+						<li>累计减少：<span style="font-size: 24px;" id="yf_all">3460.23</span><span
+							style="color: #a1a1a1;">油费支付</span></li>
+					</ul>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="table_cj">
+		<div class='wrapper'>
+			<canvas height='140' id='canvas' width='1300'></canvas>
+		</div>
+		<script src='js/Chart.min.js'></script>
+		<script src="js/index.js"></script>
+	</div>
+
+	<script>
+		$(function() {
+			
+			var clock = $('#clock');
+			//定义数字数组0-9
+			var digit_to_name = [ 'zero', 'one', 'two', 'three', 'four',
+					'five', 'six', 'seven', 'eight', 'nine' ];
+			//定义星期
+			var weekday = [ '周日', '周一', '周二', '周三', '周四', '周五', '周六' ];
+
+			var digits = {};
+
+			//定义时分秒位置
+			var positions = [ 'h1', 'h2', ':', 'm1', 'm2', ':', 's1', 's2' ];
+			
+			//构建数字时钟的时分秒
+
+			var digit_holder = clock.find('.digits');
+
+			$.each(positions, function() {
+
+				if (this == ':') {
+					digit_holder.append('<div class="dots">');
+				} else {
+
+					var pos = $('<div>');
+
+					for (var i = 1; i < 8; i++) {
+						pos.append('<span class="d' + i + '">');
+					}
+
+					digits[this] = pos;
+
+					digit_holder.append(pos);
+				}
+
+			});
+
+			// 让时钟跑起来
+			(function update_time() {
+
+				//调用moment.js来格式化时间
+				var now = moment().format("HHmmss");
+
+				digits.h1.attr('class', digit_to_name[now[0]]);
+				digits.h2.attr('class', digit_to_name[now[1]]);
+				digits.m1.attr('class', digit_to_name[now[2]]);
+				digits.m2.attr('class', digit_to_name[now[3]]);
+				digits.s1.attr('class', digit_to_name[now[4]]);
+				digits.s2.attr('class', digit_to_name[now[5]]);
+
+				var date = moment().format("YYYY年MM月DD日");
+				var week = weekday[moment().format('d')];
+				$(".date").html(date + ' ' + week);
+
+				// 每秒钟运行一次
+				setTimeout(update_time, 1000);
+
+			})();
+		});
+	</script>
+</body>
+</html>

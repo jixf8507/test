@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 固定资产信息查询SQL -->
+	<bean id="ASSET_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		select a.*,c.name,s.siteName,m.manufacturerName,m.fullName,m.address,
+      		m.linkman,m.linkphone,m.email,u.userName from merchant_assets a 
+      		left join merchant_assets_category c on (a.categoryId = c.id) 
+      		left join site s on (a.siteId = s.id) 
+      		left join car_manufacturer m on (a.manufacturId = m.id) 
+      	    left join merchant_user u on (a.userId = u.id) where 1=1 
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="merchantId" />
+					<property name="value" value="and a.merchantId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and a.siteId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="categoryId" />
+					<property name="value" value="and a.categoryId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag" />
+					<property name="value" value="and a.flag=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="assetsName" />
+					<property name="value" value="and a.assetsName like ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.purchaseDate >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and a.purchaseDate <=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag1" />
+					<property name="value" value="and a.flag != ?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="flag2" />
+					<property name="value" value="and a.flag != ?" />
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY a.id desc " />
+	</bean>
+	
+	<!-- 固定资产使用信息查询SQL -->
+	<bean id="ASSET_USE_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		 select u.*,a.assetsName,s.siteName,mu.userName from merchant_assets_use_detail d 
+      		 inner join merchant_assets_use u on (d.useId=u.id) 
+      		 inner join merchant_assets a on (a.id=d.assetsId) 
+      		 left join site s on (u.siteId = s.id) 
+      		 left join merchant_user mu on (u.userId = mu.id)
+      		 where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="assetsId" />
+					<property name="value" value="and d.assetsId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="siteId" />
+					<property name="value" value="and u.siteId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and u.useDate >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and u.useDate <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY d.id desc " />
+	</bean>
+	
+	<!-- 固定资产维修信息查询SQL -->
+	<bean id="ASSET_REPAIR_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		 select d.*,a.assetsName,r.repairDate,r.manufacturerId,m.manufacturerName,
+      		 m.fullName,r.applyUser,r.transactUser,r.remarks
+      		 from merchant_assets_repair_detail d 
+      		 inner join merchant_assets_repair r on (d.repairId=r.id) 
+      		 inner join merchant_assets a on (a.id=d.assetsId) 
+      		 left join car_manufacturer m on (r.manufacturerId = m.id) 
+      		 where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="assetsId" />
+					<property name="value" value="and d.assetsId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.repairDate >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.repairDate <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY d.id desc " />
+	</bean>
+	
+	<!-- 固定资产减少信息查询SQL -->
+	<bean id="ASSET_REDUCE_SELECT_SQL" class="com.qx.common.sql.JSONSqlMapping">
+		<property name="select">
+			<value><![CDATA[
+      		 select r.*,a.assetsName from merchant_assets_reduce_detail d 
+      		 inner join merchant_assets_reduce r on (d.reduceId=r.id) 
+      		 inner join merchant_assets a on (a.id=d.assetsId) 
+      		 where 1=1
+		 ]]></value>
+		</property>
+		<property name="conditions">
+			<list>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="assetsId" />
+					<property name="value" value="and d.assetsId=?" />
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="beginTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.repairDate >=? ]]>
+						</value>
+					</property>
+				</bean>
+				<bean class="com.qx.common.sql.Condition">
+					<property name="key" value="endTime" />
+					<property name="value">
+						<value>
+						<![CDATA[ and r.repairDate <=? ]]>
+						</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+		<property name="order" value=" ORDER BY d.id desc " />
+	</bean>
+
+</beans>
